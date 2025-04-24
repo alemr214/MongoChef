@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import EmailStr
 from pymongo.errors import DuplicateKeyError
-from models.users_models import Users
+from app.models.users_model import Users
 from schemas.users_schema import UsersBase
 
 from typing import List
