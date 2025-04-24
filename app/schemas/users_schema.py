@@ -4,7 +4,7 @@ from typing import Union
 
 class UsersBase(BaseModel):
     """
-    Pydantic model for user validation.
+    Pydantic model for users validation in the endpoint
 
     Attributes:
         - name: str
