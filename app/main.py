@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from database import init
-from routers import users_routers
+from routers import users_router, ingredients_router
 from typing import AsyncGenerator, Any
 
 
@@ -27,4 +27,5 @@ app = FastAPI(
     lifespan=lifespan,  # Event handler for the lifespan of the app
 )
 
-app.include_router(users_routers.router, tags=["users"])
+app.include_router(users_router.router, tags=["users"])
+app.include_router(ingredients_router.router, tags=["ingredients"])
