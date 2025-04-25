@@ -8,7 +8,7 @@ from typing import AsyncGenerator, Any
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     """
-    Lifespan event handler for the FastAPI application to make a connection with MongoDB using Beanie ORM.
+    Lifespan event handler for the FastAPI application to make a connection with MongoDB using Beanie ODM.
 
     Args:
         app (FastAPI): FastAPI application instance.
