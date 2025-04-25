@@ -1,0 +1,21 @@
+meta {
+  name: UPDATE User
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://127.0.0.1:8000/users/update/pruebaale@example.com
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Juan",
+    "lastname1": "Benito",
+    "lastname2": "Rivera",
+    "email": "pruebabenito@example.com",
+    "passwd": "test12345"
+  }
+}
