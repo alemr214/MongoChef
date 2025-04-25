@@ -1,7 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from database import init
-from routers import users_router, ingredients_router, kitchen_tools_router
+from routers import (
+    users_router,
+    ingredients_router,
+    kitchen_tools_router,
+    categories_router,
+)
 from typing import AsyncGenerator, Any
 
 
@@ -30,3 +35,4 @@ app = FastAPI(
 app.include_router(users_router.router, tags=["users"])
 app.include_router(ingredients_router.router, tags=["ingredients"])
 app.include_router(kitchen_tools_router.router, tags=["kitchen_tools"])
+app.include_router(categories_router.router, tags=["categories"])
