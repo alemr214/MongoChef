@@ -3,17 +3,23 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from models.users_model import Users
 from models.ingredients_model import Ingredients
 from models.kitchen_tools_model import KitchenTools
+from models.categories_model import Categories
 
 # MongoDB connection settings
 DATABASE_URL = "mongodb://localhost:27017"
 DATABASE_NAME = "mongochef"
-COLLECTIONS = [Users, Ingredients, KitchenTools]  # Collections to use and create
+COLLECTIONS = [
+    Users,
+    Ingredients,
+    KitchenTools,
+    Categories,
+]  # Collections to use and create
 
 
 # Init connection to MongoDB with Beanie
 async def init() -> AsyncIOMotorClient:
     """
-    Initialize the MongoDB connection and Beanie ORM.
+    Initialize the MongoDB connection and Beanie ODM.
 
     Returns:
         AsyncIOMotorClient: The MongoDB client instance.
