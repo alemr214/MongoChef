@@ -8,7 +8,7 @@ from typing import List
 router = APIRouter(prefix="/categories")
 
 
-@router.get("/", response_model=List[Categories()])
+@router.get("/", response_model=List[Categories])
 async def get_categories() -> List[Categories]:
     """
     Get all categories stored in the database in a list.
