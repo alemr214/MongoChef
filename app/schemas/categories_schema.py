@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class IngredientsBase(BaseModel):
+class CategoriesBase(BaseModel):
     """
     Pydantic model for recipes categories validation in the endpoint.
 
