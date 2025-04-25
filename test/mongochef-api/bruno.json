@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "mongochef-api-users",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
