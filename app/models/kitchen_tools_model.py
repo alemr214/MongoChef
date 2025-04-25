@@ -3,7 +3,7 @@ from beanie import Document, Indexed
 
 class KitchenTools(Document):
     """
-    Kitchen Tools model extends from Document for MongoDB template with Beanie ORM.
+    Kitchen Tools model extends from Document for MongoDB template with Beanie ODM.
 
     Attributes:
         - name: str

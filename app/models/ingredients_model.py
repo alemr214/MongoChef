@@ -3,7 +3,7 @@ from beanie import Document, Indexed
 
 class Ingredients(Document):
     """
-    Ingredients model extends from Document for MongoDB template with Beanie ORM.
+    Ingredients model extends from Document for MongoDB template with Beanie ODM.
 
     Attributes:
         - name: str

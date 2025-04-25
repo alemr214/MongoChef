@@ -4,7 +4,7 @@ from pydantic import EmailStr
 
 class Users(Document):
     """
-    Users model extends from Document for MongoDB template with Beanie ORM.
+    Users model extends from Document for MongoDB template with Beanie ODM.
 
     Attributes:
         - name: str
