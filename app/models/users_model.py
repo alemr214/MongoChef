@@ -18,7 +18,6 @@ class Users(Document):
     lastname1: str
     lastname2: str | None
     email: Indexed(EmailStr, unique=True)  # type: ignore
-    passwd: str
 
     class Settings:
         name = "users"
