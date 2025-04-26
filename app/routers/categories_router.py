@@ -61,6 +61,7 @@ async def create_category(category: CategoriesBase) -> Categories:
     """
     try:
         new_category = Categories(**category.model_dump())
+        await new_category.create()
         return new_category
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail="Category already exists")
