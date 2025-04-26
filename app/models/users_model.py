@@ -1,7 +1,7 @@
 from beanie import Document, Indexed, Link
 from pydantic import EmailStr
 from typing import List
-from recipies_model import Recipes
+from .recipes_model import Recipes
 
 
 class Users(Document):
