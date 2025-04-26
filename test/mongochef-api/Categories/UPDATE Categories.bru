@@ -1,0 +1,18 @@
+meta {
+  name: UPDATE Categories
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://127.0.0.1:8000/categories/update/postres
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "entradas",
+    "description": "Pastas, sopas y mas"
+  }
+}
