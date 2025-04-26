@@ -63,6 +63,7 @@ async def create_kitchen_tool(kitchen_tool: KitchenToolsBase) -> KitchenTools:
     """
     try:
         new_kitchen_tool = KitchenTools(**kitchen_tool.model_dump())
+        await new_kitchen_tool.insert()
         return new_kitchen_tool
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail="Kitchen tool already exists")

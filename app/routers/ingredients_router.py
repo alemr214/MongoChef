@@ -66,6 +66,7 @@ async def create_ingredient(ingredient: IngredientsBase) -> Ingredients:
     """
     try:
         new_ingredient = Ingredients(**ingredient.model_dump())
+        await new_ingredient.insert()
         return new_ingredient
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail="Ingredient already exists")
