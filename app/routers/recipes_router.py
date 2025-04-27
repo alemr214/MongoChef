@@ -1,8 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from pymongo.errors import DuplicateKeyError
-from models.recipes_model import Recipes
+from models.categories_model import Categories
+from models.kitchen_tools_model import KitchenTools
+from models.ingredients_model import Ingredients
+from models.recipes_model import (
+    CategoriesInfo,
+    IngredientsDetail,
+    IngredientsInfo,
+    KitchenToolsInfo,
+    Recipes,
+)
 from schemas.recipes_schema import RecipesBase
+from datetime import timedelta
+from utils.normalize import normalized_string
 
 
 router = APIRouter(prefix="/recipes")
@@ -48,23 +59,87 @@ async def get_recipe_by_title(recipes_title: str) -> Recipes:
 @router.post("/create", response_model=Recipes)
 async def create_recipe(recipe: RecipesBase) -> Recipes:
     """
-    Create a new recipe in the database.
+    Create a new recipe in the database checking if the recipe already exists. Creating ingredients, kitchen tools and categories if they do not exist or use if they do.
 
     Args:
-        recipe (RecipesBase): The recipe object to create.
+        recipe (RecipesBase): Recipe object model from the request body.
 
     Raises:
-        HTTPException: If the recipe already exists, a 409 Conflict error is raised.
+        HTTPException: If the recipe with the same title already exists, a 400 Bad Request error is raised.
 
     Returns:
         Recipes: The created recipe object.
     """
+    ingredients_list = []
+    kitchen_tools_list = []
+
+    for ingredient in recipe.ingredients:
+        ingredient_obj = await Ingredients.find_one(
+            Ingredients.name == normalized_string(ingredient.name)
+        )
+        if not ingredient_obj:
+            ingredient_obj = Ingredients(name=normalized_string(ingredient.name))
+            await ingredient_obj.insert()
+
+        ingredients_list.append(
+            IngredientsDetail(
+                ingredient_object=IngredientsInfo(
+                    id=str(ingredient_obj.id),
+                    name=normalized_string(ingredient_obj.name),
+                ),
+                quantity=ingredient.quantity,
+                unit=normalized_string(ingredient.unit),
+            )
+        )
+
+    for kitchen_tool in recipe.kitchen_tools:
+        kitchen_tool_obj = await KitchenTools.find_one(
+            KitchenTools.name == normalized_string(kitchen_tool.name)
+        )
+        if not kitchen_tool_obj:
+            kitchen_tool_obj = KitchenTools(name=normalized_string(kitchen_tool.name))
+            await kitchen_tool_obj.insert()
+
+        kitchen_tools_list.append(
+            KitchenToolsInfo(
+                id=str(kitchen_tool_obj.id),
+                name=normalized_string(kitchen_tool_obj.name),
+            )
+        )
+
+    category_obj = await Categories.find_one(
+        Categories.name == normalized_string(recipe.category.name)
+    )
+
+    if not category_obj:
+        category_obj = Categories(
+            name=normalized_string(recipe.category.name), description=None
+        )
+        await category_obj.insert()
+
+    category_info = CategoriesInfo(
+        id=str(category_obj.id),
+        name=normalized_string(category_obj.name),
+        description=category_obj.description,
+    )
+
+    recipe_obj = Recipes(
+        title=normalized_string(recipe.title),
+        ingredients=ingredients_list,
+        kitchen_tools=kitchen_tools_list,
+        portions=recipe.portions,
+        instructions=recipe.instructions,
+        cooking_time=timedelta(minutes=recipe.cooking_time),
+        category=category_info,
+    )
+
     try:
-        new_recipe = await Recipes(**recipe.model_dump())
-        await new_recipe.insert()
-        return new_recipe
+        await recipe_obj.insert()
+        return recipe_obj
     except DuplicateKeyError:
-        raise HTTPException(status_code=409, detail="Recipe already exists")
+        raise HTTPException(
+            status_code=400, detail="Recipe with this title already exists"
+        )
 
 
 @router.put("/update/{recipe_title}")
