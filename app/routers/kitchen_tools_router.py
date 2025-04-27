@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from utils.normalize import normalized_string
 from models.kitchen_tools_model import KitchenTools
 from schemas.kitchen_tools_schema import KitchenToolsBase
 from pymongo.errors import DuplicateKeyError
@@ -40,7 +41,7 @@ async def get_kitchen_tool_by_name(kitchen_tool_name: str) -> KitchenTools:
         KitchenTools: The kitchen tool object if found.
     """
     existing_kitchen_tool = await KitchenTools.find_one(
-        KitchenTools.name == kitchen_tool_name
+        KitchenTools.name == normalized_string(kitchen_tool_name)
     )
     if not existing_kitchen_tool:
         raise HTTPException(status_code=404, detail="Kitchen tool not found")
@@ -63,6 +64,7 @@ async def create_kitchen_tool(kitchen_tool: KitchenToolsBase) -> KitchenTools:
     """
     try:
         new_kitchen_tool = KitchenTools(**kitchen_tool.model_dump())
+        new_kitchen_tool.name = normalized_string(kitchen_tool.name)
         await new_kitchen_tool.insert()
         return new_kitchen_tool
     except DuplicateKeyError:
@@ -88,14 +90,14 @@ async def update_kitchen_tool(
         KitchenTools: The updated kitchen tool object from beanie model.
     """
     existing_kitchen_tool = await KitchenTools.find_one(
-        KitchenTools.name == kitchen_tool_name
+        KitchenTools.name == normalized_string(kitchen_tool_name)
     )
 
     if not existing_kitchen_tool:
         raise HTTPException(status_code=404, detail="kitchen_tool not found")
 
     if kitchen_tool.name and kitchen_tool.name != existing_kitchen_tool.name:
-        existing_kitchen_tool.name = kitchen_tool.name
+        existing_kitchen_tool.name = normalized_string(kitchen_tool.name)
         await existing_kitchen_tool.save()
     else:
         raise HTTPException(
@@ -122,7 +124,7 @@ async def delete_kitchen_tool(kitchen_tool_name: str) -> KitchenTools:
         KitchenTools: The deleted kitchen tool object from Beanie model into the database.
     """
     existing_kitchen_tool = await KitchenTools.find_one(
-        KitchenTools.name == kitchen_tool_name
+        KitchenTools.name == normalized_string(kitchen_tool_name)
     )
 
     if not existing_kitchen_tool:
