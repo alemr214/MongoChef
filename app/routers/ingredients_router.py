@@ -3,6 +3,7 @@ from models.ingredients_model import Ingredients
 from schemas.ingredients_schema import IngredientsBase
 from pymongo.errors import DuplicateKeyError
 from typing import List
+from utils.normalize import normalized_string
 
 
 router = APIRouter(prefix="/ingredients")
@@ -42,7 +43,7 @@ async def get_ingredient_by_name(ingredient_name: str) -> Ingredients:
         Ingredients: The ingredient object if found.
     """
     existing_ingredient = await Ingredients.find_one(
-        Ingredients.name == ingredient_name
+        Ingredients.name == normalized_string(ingredient_name)
     )
     if not existing_ingredient:
         raise HTTPException(status_code=404, detail="Ingredient not found")
@@ -66,6 +67,7 @@ async def create_ingredient(ingredient: IngredientsBase) -> Ingredients:
     """
     try:
         new_ingredient = Ingredients(**ingredient.model_dump())
+        new_ingredient.name = normalized_string(new_ingredient.name)
         await new_ingredient.insert()
         return new_ingredient
     except DuplicateKeyError:
@@ -92,14 +94,14 @@ async def update_ingredient(
         Ingredients: The updated ingredient object from Beanie model.
     """
     existing_ingredient = await Ingredients.find_one(
-        Ingredients.name == ingredient_name
+        Ingredients.name == normalized_string(ingredient_name)
     )
 
     if not existing_ingredient:
         raise HTTPException(status_code=404, detail="Ingredient not found")
 
     if ingredient.name and ingredient.name != existing_ingredient.name:
-        existing_ingredient.name = ingredient.name
+        existing_ingredient.name = normalized_string(ingredient.name)
         await existing_ingredient.save()
     else:
         raise HTTPException(
@@ -126,7 +128,7 @@ async def delete_ingredient(ingredient_name: str) -> Ingredients:
         Ingredients: The deleted ingredient object from Beanie model into the database.
     """
     existing_ingredient = await Ingredients.find_one(
-        Ingredients.name == ingredient_name
+        Ingredients.name == normalized_string(ingredient_name)
     )
 
     if not existing_ingredient:
