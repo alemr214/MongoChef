@@ -41,7 +41,7 @@ async def get_recipe_by_title(recipes_title: str) -> Recipes:
     """
     Get a recipe by its title.
 
-    Args:
+    Args
         recipes_title (str): The title of the recipe to retrieve.
 
     Raises:
@@ -50,10 +50,12 @@ async def get_recipe_by_title(recipes_title: str) -> Recipes:
     Returns:
         Recipes: The recipe object if found.
     """
-    recipe = await Recipes.find_one({"title": recipes_title})
-    if not recipe:
+    existing_recipe = await Recipes.find_one(
+        Recipes.title == normalized_string(recipes_title)
+    )
+    if not existing_recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
-    return recipe
+    return existing_recipe
 
 
 @router.post("/create", response_model=Recipes)
@@ -70,17 +72,21 @@ async def create_recipe(recipe: RecipesBase) -> Recipes:
     Returns:
         Recipes: The created recipe object.
     """
+    # List to store the ingredients and kitchen tools dicts
     ingredients_list = []
     kitchen_tools_list = []
 
+    # Check if the recipe already exists
     for ingredient in recipe.ingredients:
         ingredient_obj = await Ingredients.find_one(
             Ingredients.name == normalized_string(ingredient.name)
         )
+        # If the ingredient does not exist, create it
         if not ingredient_obj:
             ingredient_obj = Ingredients(name=normalized_string(ingredient.name))
             await ingredient_obj.insert()
 
+        # Append the ingredient object to the list
         ingredients_list.append(
             IngredientsDetail(
                 ingredient_object=IngredientsInfo(
@@ -92,14 +98,17 @@ async def create_recipe(recipe: RecipesBase) -> Recipes:
             )
         )
 
+    # Check if the kitchen tool already exists
     for kitchen_tool in recipe.kitchen_tools:
         kitchen_tool_obj = await KitchenTools.find_one(
             KitchenTools.name == normalized_string(kitchen_tool.name)
         )
+        # If the kitchen tool does not exist, create it
         if not kitchen_tool_obj:
             kitchen_tool_obj = KitchenTools(name=normalized_string(kitchen_tool.name))
             await kitchen_tool_obj.insert()
 
+        # Append the kitchen tool object to the list
         kitchen_tools_list.append(
             KitchenToolsInfo(
                 id=str(kitchen_tool_obj.id),
@@ -107,22 +116,24 @@ async def create_recipe(recipe: RecipesBase) -> Recipes:
             )
         )
 
+    # Check if the category already exists
     category_obj = await Categories.find_one(
         Categories.name == normalized_string(recipe.category.name)
     )
-
+    # If the category does not exist, create it
     if not category_obj:
         category_obj = Categories(
             name=normalized_string(recipe.category.name), description=None
         )
         await category_obj.insert()
-
+    # Create the category info object
     category_info = CategoriesInfo(
         id=str(category_obj.id),
         name=normalized_string(category_obj.name),
         description=category_obj.description,
     )
 
+    # Create the recipe object
     recipe_obj = Recipes(
         title=normalized_string(recipe.title),
         ingredients=ingredients_list,
@@ -142,37 +153,101 @@ async def create_recipe(recipe: RecipesBase) -> Recipes:
         )
 
 
-@router.put("/update/{recipe_title}")
+@router.put("/update/{recipe_title}", response_model=Recipes)
 async def update_recipe(recipe_title: str, recipe: RecipesBase) -> Recipes:
     """
     Update an existing recipe in the database.
 
     Args:
         recipe_title (str): The title of the recipe to update.
-        recipe (RecipesBase): The recipe object with updated data.
+        recipe (RecipesBase): The updated recipe object.
 
     Raises:
-        HTTPException: If the recipe is not found, a 404 Not Found error is raised.
-        HTTPException: If no data is provided for update, a 400 Bad Request error is raised.
+        HTTPException: The recipe with the given title does not exist, a 404 Not Found error is raised.
+        HTTPException: If another recipe with the same title already exists, a 400 Bad Request error is raised.
 
     Returns:
         Recipes: The updated recipe object.
     """
-    existing_recipe = await Recipes.find_one(Recipes.title == recipe_title)
-
+    # Find the existing recipe by title
+    existing_recipe = await Recipes.find_one(
+        Recipes.title == normalized_string(recipe_title)
+    )
     if not existing_recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
 
-    updated_data = recipe.model_dump()
+    ingredients_list = []
+    for ingredient in recipe.ingredients:
+        name_norm = normalized_string(ingredient.name)
+        # Check if the ingredient already exists
+        ingr_obj = await Ingredients.find_one(Ingredients.name == name_norm)
+        if not ingr_obj:
+            # If the ingredient does not exist, create it
+            ingr_obj = Ingredients(name=name_norm)
+            await ingr_obj.insert()
 
-    if not updated_data:
-        raise HTTPException(status_code=400, detail="No data provided for update")
+        # Append the ingredient object to the list
+        ingredients_list.append(
+            IngredientsDetail(
+                ingredient_object=IngredientsInfo(
+                    id=str(ingr_obj.id),
+                    name=ingr_obj.name,
+                ),
+                quantity=ingredient.quantity,
+                unit=normalized_string(ingredient.unit),
+            )
+        )
 
-    for field, value in updated_data.items():
-        setattr(existing_recipe, field, value)
+    kitchen_tools_list = []
+    for tool in recipe.kitchen_tools:
+        tool_name = normalized_string(tool.name)
+        # Check if the kitchen tool already exists
+        tool_obj = await KitchenTools.find_one(KitchenTools.name == tool_name)
+        if not tool_obj:
+            # If the kitchen tool does not exist, create it
+            tool_obj = KitchenTools(name=tool_name)
+            await tool_obj.insert()
 
-    await existing_recipe.save()
-    return existing_recipe
+        # Append the kitchen tool object to the list
+        kitchen_tools_list.append(
+            KitchenToolsInfo(
+                id=str(tool_obj.id),
+                name=tool_obj.name,
+            )
+        )
+
+    cat_name = normalized_string(recipe.category.name)
+    # Check if the category already exists
+    cat_obj = await Categories.find_one(Categories.name == cat_name)
+    if not cat_obj:
+        # If the category does not exist, create it
+        cat_obj = Categories(name=cat_name, description=None)
+        await cat_obj.insert()
+
+    # Create the category info object
+    category_info = CategoriesInfo(
+        id=str(cat_obj.id),
+        name=cat_obj.name,
+        description=cat_obj.description,
+    )
+
+    # Update the existing recipe with the new values
+    existing_recipe.title = normalized_string(recipe.title)
+    existing_recipe.ingredients = ingredients_list
+    existing_recipe.kitchen_tools = kitchen_tools_list
+    existing_recipe.portions = recipe.portions
+    existing_recipe.instructions = recipe.instructions
+    existing_recipe.cooking_time = timedelta(minutes=recipe.cooking_time)
+    existing_recipe.category = category_info
+
+    # Save the updated recipe to the database
+    try:
+        await existing_recipe.save()
+        return existing_recipe
+    except DuplicateKeyError:
+        raise HTTPException(
+            status_code=400, detail="Another recipe with this title already exists"
+        )
 
 
 @router.delete("/delete/{recipe_title}", response_model=Recipes)
