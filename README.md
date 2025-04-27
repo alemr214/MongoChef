@@ -6,16 +6,18 @@ A fast and friendly desktop recipe manager built with MongoDB, FastAPI, and Tkin
 
 ### Folder structure diagram
 
-        .
-        ├── app/
-        │   ├── models/                    # Beanie models for MongoDB database.
-        │   ├── routers/                   # FastAPI routers for every collection with CRUD operations.
-        │   ├── schemas/                   # Pydantic Schemas for I/O endpoints validation
-        │   ├── database.py                # Initial MongoDB connection configuration
-        │   └── main.py                    # Initial FastAPI configuration
-        ├── test/
-        ├── README.md
-        └── requirements.txt               # Libraries used in this project.
+        └── 📁MongoChef
+        └── 📁app
+                └── database.py
+                └── main.py
+                └── 📁models
+                └── 📁routers
+                └── 📁schemas
+                └── 📁utils
+        └── 📁gui
+        └── .gitignore
+        └── README.md
+        └── requirements.txt
 
 ### Prerequisites
 

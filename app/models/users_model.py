@@ -1,7 +1,5 @@
 from beanie import Document, Indexed, Link
 from pydantic import EmailStr
-from typing import List
-from .recipes_model import Recipes
 
 
 class Users(Document):
@@ -20,7 +18,6 @@ class Users(Document):
     lastname1: str
     lastname2: str | None
     email: Indexed(EmailStr, unique=True)  # type: ignore
-    favorite_recipes: List[Link[Recipes]]
 
     class Settings:
         name = "users"
