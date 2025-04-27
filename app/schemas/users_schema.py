@@ -18,4 +18,3 @@ class UsersBase(BaseModel):
     lastname1: str = Field(min_length=1, max_length=70)
     lastname2: Union[str, None] = Field(default=None, max_length=70)
     email: EmailStr = Field(min_length=1, max_length=150)
-    favorite_recipes: Union[list, None] = Field(default=None)
