@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE Ingredients
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://127.0.0.1:8000/ingredients/update/   cebollin
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "tomate"
+  }
+}

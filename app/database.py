@@ -4,6 +4,7 @@ from models.users_model import Users
 from models.ingredients_model import Ingredients
 from models.kitchen_tools_model import KitchenTools
 from models.categories_model import Categories
+from models.recipes_model import Recipes
 
 # MongoDB connection settings
 DATABASE_URL = "mongodb://localhost:27017"
@@ -13,6 +14,7 @@ COLLECTIONS = [
     Ingredients,
     KitchenTools,
     Categories,
+    Recipes,
 ]  # Collections to use and create
 
 

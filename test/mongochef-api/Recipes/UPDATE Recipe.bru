@@ -1,0 +1,50 @@
+meta {
+  name: UPDATE Recipe
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://127.0.0.1:8000/recipes/update/empanadas de queso
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "jamon con chorizo",
+    "ingredients": [
+      {
+        "name": "Jamon",
+        "quantity": 300,
+        "unit": "gramos"
+      },
+      {
+        "name": "aceite",
+        "quantity": 20,
+        "unit": "mililtros"
+      },
+      {
+        "name": "chorizo",
+        "quantity": 150,
+        "unit": "gramos"
+      },
+      {
+        "name": "polvo para hornear",
+        "quantity": 150,
+        "unit": "gramos"
+      }
+    ],
+    "kitchen_tools": [
+      {
+        "name": "Cuchara De Cocina"
+      }
+    ],
+    "portions": 10,
+    "instructions": "Picar el jamon en cuadros. Desmenuzar el chorizo. Freir el jamon hasta lograr consistencia deseada Revolver jamon y chorizo",
+    "cooking_time": 30,
+    "category": {
+      "name": "Plato fuerte"
+    }
+  }
+}

@@ -3,7 +3,7 @@ from models.categories_model import Categories
 from schemas.categories_schema import CategoriesBase
 from pymongo.errors import DuplicateKeyError
 from typing import List
-
+from utils.normalize import normalized_string
 
 router = APIRouter(prefix="/categories")
 
@@ -39,7 +39,9 @@ async def get_category_by_name(category_name: str) -> Categories:
     Returns:
         Categories: The category object if found.
     """
-    existing_category = await Categories.find_one(Categories.name == category_name)
+    existing_category = await Categories.find_one(
+        Categories.name == normalized_string(category_name)
+    )
     if not existing_category:
         raise HTTPException(status_code=404, detail="Category not found")
     return existing_category
@@ -61,6 +63,8 @@ async def create_category(category: CategoriesBase) -> Categories:
     """
     try:
         new_category = Categories(**category.model_dump())
+        new_category.name = normalized_string(category.name)
+        await new_category.create()
         return new_category
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail="Category already exists")
@@ -82,7 +86,9 @@ async def update_category(category_name: str, category: CategoriesBase) -> Categ
     Returns:
         Categories: The updated category object from beanie model.
     """
-    existing_category = await Categories.find_one(Categories.name == category_name)
+    existing_category = await Categories.find_one(
+        Categories.name == normalized_string(category_name)
+    )
 
     if not existing_category:
         raise HTTPException(status_code=404, detail="category not found")
@@ -95,6 +101,7 @@ async def update_category(category_name: str, category: CategoriesBase) -> Categ
     for field, value in update_data.items():
         setattr(existing_category, field, value)
 
+    existing_category.name = normalized_string(category.name)
     await existing_category.save()
     return existing_category
 
@@ -114,7 +121,9 @@ async def delete_category(category_name: str) -> Categories:
     Returns:
         Categories: The deleted category object from Beanie model into the database.
     """
-    existing_category = await Categories.find_one(Categories.name == category_name)
+    existing_category = await Categories.find_one(
+        Categories.name == normalized_string(category_name)
+    )
 
     if not existing_category:
         raise HTTPException(status_code=404, detail="Category not found")

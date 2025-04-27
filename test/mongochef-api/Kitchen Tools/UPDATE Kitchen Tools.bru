@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE Kitchen Tools
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://127.0.0.1:8000/kitchen_tools/update/Espatula
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "cuchara"
+  }
+}

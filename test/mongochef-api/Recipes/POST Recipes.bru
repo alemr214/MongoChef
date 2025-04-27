@@ -1,0 +1,50 @@
+meta {
+  name: POST Recipes
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://127.0.0.1:8000/recipes/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "         empanadas de queso       ",
+    "ingredients": [
+      {
+        "name": "       Masa de Maiz       ",
+        "quantity": 500,
+        "unit": "gramos"
+      },
+      {
+        "name": "aceite",
+        "quantity": 700,
+        "unit": "mililtros"
+      },
+      {
+        "name": "polvo para hornear",
+        "quantity": 1,
+        "unit": "Cucharadita"
+      },
+      {
+        "name": "queso fresco",
+        "quantity": 400,
+        "unit": "gramos"
+      }
+    ],
+    "kitchen_tools": [
+      {
+        "name": "Cuchara De Cocina"
+      }
+    ],
+    "portions": 10,
+    "instructions": "Revolver la masa con polvo para hornear. Extender la masa en forma de tortilla. Colocar el relleno al gusto. Cerrar a la mitad la tortilla. Freir hasta cocinar la masa.",
+    "cooking_time": 40,
+    "category": {
+      "name": "Antojitos"
+    }
+  }
+}

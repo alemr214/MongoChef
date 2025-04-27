@@ -6,6 +6,7 @@ from routers import (
     ingredients_router,
     kitchen_tools_router,
     categories_router,
+    recipes_router,
 )
 from typing import AsyncGenerator, Any
 
@@ -36,3 +37,4 @@ app.include_router(users_router.router, tags=["users"])
 app.include_router(ingredients_router.router, tags=["ingredients"])
 app.include_router(kitchen_tools_router.router, tags=["kitchen_tools"])
 app.include_router(categories_router.router, tags=["categories"])
+app.include_router(recipes_router.router, tags=["recipes"])
